@@ -1,10 +1,34 @@
-# A very simple Flask Hello World app for you to get started with...
-from flask import Flask
-app = Flask(__name__)
-@app.route('/')
-def hello_world():
-    return '<p>Alterações por meio do PythonAnyWhere -> GitHub</p><table><tr><td><b>Professor:</b></td><td>Professor Fabio Teixeira</td></tr><tr><td><b>Prontuário:</b></td><td>PT23820X</td></tr></table>'
+from datetime import datetime
+from flask import Flask, render_template
+from flask_bootstrap import Bootstrap
+from flask_moment import Moment
 
-@app.route('/user/<name>')
+app = Flask(__name__)
+
+bootstrap = Bootstrap(app)
+moment = Moment(app)
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    return render_template('500.html'), 500
+
+
+@app.route('/')
+def index():
+     return render_template('index.html', current_time=datetime.utcnow())
+
+
+@app.route('/user/<name>/<pront>/inst')
 def user(name):
-    return '<h1>Hello, {}!</h1>'.format(name)
+    return render_template('user.html', name=name, pront=pront, inst=inst)
+
+@app.route('/contextorequisicao/<name>')
+def user(name):
+    
+    return render_template('contexto.html', name=name, user_agent=request.headers.get('User-Agent'), ip=request.remote_addr, host=request.host)
