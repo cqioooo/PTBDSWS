@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 
@@ -21,14 +21,20 @@ def internal_server_error(e):
 
 @app.route('/')
 def index():
-     return render_template('index.html', current_time=datetime.utcnow())
+    return render_template('index.html', current_time=datetime.utcnow())
 
 
-@app.route('/user/<name>/<pront>/inst')
-def user(name):
+@app.route('/user/<name>/<pront>/<inst>')
+def user(name, pront, inst):
     return render_template('user.html', name=name, pront=pront, inst=inst)
 
+
 @app.route('/contextorequisicao/<name>')
-def user(name):
-    
-    return render_template('contexto.html', name=name, user_agent=request.headers.get('User-Agent'), ip=request.remote_addr, host=request.host)
+def contexto(name):
+    return render_template(
+        'contexto.html',
+        name=name,
+        user_agent=request.headers.get('User-Agent'),
+        ip=request.remote_addr,
+        host=request.host
+    )
