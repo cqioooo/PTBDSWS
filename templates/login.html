@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Avaliação contínua: Aula 050.B{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    {% if name and last_name %}
+        <h1>Olá, {{ name }} {{ last_name }}!</h1>
+        <h3>A sua Insituição de ensino é {{ institution }}</h3>
+        <h3>Está cursando a disciplina de {{ subject }}</h3>
+        <br>
+        <p>O IP do computador remoto é: {{ ip[0] if ip is sequence and ip is not string else ip }}</p>
+        <p>O host da aplicação é: {{ host }}</p>
+    {% else %}
+        <h1>Olá, Estranho!</h1>
+    {% endif %}
+</div>
+
+{{ wtf.quick_form(form) }}
+
+{% if current_time %}
+    <p>The local date and time is {{ moment(current_time).format('LLLL') }}.</p>
+    <p>That was {{ moment(current_time).fromNow(refresh=True) }}.</p>
+{% endif %}
+{% endblock %}
