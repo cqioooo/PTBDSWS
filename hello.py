@@ -77,8 +77,16 @@ def index():
             session['known'] = True
         session['name'] = form.name.data
         return redirect(url_for('index'))
-    return render_template('index.html', form=form, name=session.get('name'),
-                           known=session.get('known', False))
+
+    users = User.query.all()
+
+    return render_template(
+        'index.html',
+        form=form,
+        name=session.get('name'),
+        known=session.get('known', False),
+        users=users
+    )
 
 
 @app.route('/user/<name>/<pront>/<inst>')
