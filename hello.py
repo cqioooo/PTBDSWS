@@ -3,7 +3,7 @@ from flask import Flask, render_template, session, redirect, url_for, request
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
+from wtforms import StringField, SubmitField, SelectField
 from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -43,8 +43,14 @@ class User(db.Model):
         return '<User %r>' % self.username
 
 
+# Formulário com o campo de seleção Role?:
 class NameForm(FlaskForm):
     name = StringField('What is your name?', validators=[DataRequired()])
+    role = SelectField('Role?:', choices=[
+        ('Admin', 'Admin'),
+        ('Moderator', 'Moderator'),
+        ('User', 'User')
+    ], validators=[DataRequired()])
     submit = SubmitField('Submit')
 
 
@@ -65,27 +71,44 @@ def internal_server_error(e):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    roles_names = ['Admin', 'Moderator', 'User']
+    for r_name in roles_names:
+        if not Role.query.filter_by(name=r_name).first():
+            db.session.add(Role(name=r_name))
+    db.session.commit()
+
     form = NameForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.name.data).first()
+        selected_role = Role.query.filter_by(name=form.role.data).first()
+
         if user is None:
-            user = User(username=form.name.data)
+            user = User(username=form.name.data, role=selected_role)
             db.session.add(user)
             db.session.commit()
             session['known'] = False
         else:
+            user.role = selected_role
+            db.session.commit()
             session['known'] = True
+
         session['name'] = form.name.data
         return redirect(url_for('index'))
 
     users = User.query.all()
+    roles = Role.query.all()
+    num_users = len(users)
+    num_roles = len(roles)
 
     return render_template(
         'index.html',
         form=form,
         name=session.get('name'),
         known=session.get('known', False),
-        users=users
+        users=users,
+        roles=roles,
+        num_users=num_users,
+        num_roles=num_roles
     )
 
 
